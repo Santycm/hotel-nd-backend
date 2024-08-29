@@ -5,7 +5,7 @@ import  {db}  from "./database/connection.database.js";
 const app = express();
 
 const corsOptions = {
-  origin: "https://naturalnd.netlify.app",
+  origin: "https://naturaldreams.netlify.app",
   optionsSuccessStatus: 200,
 };
 
