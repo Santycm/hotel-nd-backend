@@ -3,6 +3,13 @@ import cors from "cors";
 import  {db}  from "./database/connection.database.js";
 
 const app = express();
+
+const corsOptions = {
+  origin: "https://naturalnd.netlify.app",
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use("/api", (req, res) => {
