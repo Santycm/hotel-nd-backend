@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
-import  {db}  from "./database/connection.database.js";
+import { db } from "./database/connection.database.js";
+import userRouter from "./routes/user.route.js";
 
 const app = express();
 
@@ -11,11 +12,11 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.use("/api", (req, res) => {
-  res.json({ message: "Hello World!" });
-});
+app.use("/api", userRouter);
 
+//TEST DB CONNECTION
 app.use("/testdb", async (req, res) => {
   try {
     const { rows } = await db.query("SELECT NOW()");
@@ -25,6 +26,7 @@ app.use("/testdb", async (req, res) => {
   }
 });
 
+//RESPONSE DEFAULT
 app.use((req, res, next) => {
   res.status(404).json({ message: "Not Found" });
 });
