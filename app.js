@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api", userRouter);
 
 //TEST DB CONNECTION
-app.use("/testdb", async (req, res) => {
+app.use("/testdb:id", async (req, res) => {
   try {
     const { rows } = await db.query("SELECT NOW()");
     res.json(rows);

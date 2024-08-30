@@ -1,9 +1,9 @@
 import { db } from "../database/connection.database.js";
 
 const create = async ({
-  id,
   name,
   lastname,
+  cedula,
   tel,
   email,
   username,
@@ -11,10 +11,10 @@ const create = async ({
 }) => {
   const query = {
     text: `
-    INSERT INTO users (id, name, lastname, tel, email, username, password)
+    INSERT INTO users (name, lastname, cedula,  tel, email, username, password)
     VALUES ($1, $2, $3, $4, $5, $6, $7)
     RETURNING name, username, email;`,
-    values: [id, name, lastname, tel, email, username, password],
+    values: [name, lastname, cedula, tel, email, username, password],
   };
 
   const { rows } = await db.query(query);
@@ -30,9 +30,10 @@ const findOneByEmail = async (email) => {
   };
 
   const { rows } = await db.query(query);
-  return rows;
+  return rows[0];
 }
 
 export const UserModel = {
   create,
+  findOneByEmail
 };
