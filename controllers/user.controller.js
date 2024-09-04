@@ -91,7 +91,21 @@ const login = async (req, res) => {
   }
 };
 
+//ruta protegida
+const profile = async (req, res) => {
+  try{
+    const user = await UserModel.findOneByEmail(req.email);
+    return res.status(200).json({ ok: true, message: user });
+  }catch(err){
+    console.log(err);
+    return res
+      .status(500)
+      .json({ ok: false, message: "Internal server error" });
+  }
+};
+
 export const UserController = {
   register,
   login,
+  profile
 };
