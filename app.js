@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { db } from "./database/connection.database.js";
 import userRouter from "./routes/user.route.js";
+import publicRouter from "./routes/public.route.js";
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", userRouter);
+app.use("/", publicRouter);
 
 //TEST DB CONNECTION
 app.use("/testdb", async (req, res) => {

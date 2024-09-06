@@ -6,15 +6,15 @@ const create = async ({
   cedula,
   tel,
   email,
-  username,
+ 
   password,
 }) => {
   const query = {
     text: `
-    INSERT INTO users (name, lastname, cedula,  tel, email, username, password)
-    VALUES ($1, $2, $3, $4, $5, $6, $7)
-    RETURNING name, username, email;`,
-    values: [name, lastname, cedula, tel, email, username, password],
+    INSERT INTO users (name, lastname, cedula,  tel, email, password)
+    VALUES ($1, $2, $3, $4, $5, $6)
+    RETURNING name, email;`,
+    values: [name, lastname, cedula, tel, email, password],
   };
 
   const { rows } = await db.query(query);

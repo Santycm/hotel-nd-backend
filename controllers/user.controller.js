@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 
 const register = async (req, res) => {
   try {
-    const { name, lastname, cedula, tel, email, username, password } = req.body;
+    const { name, lastname, cedula, tel, email, password } = req.body;
     console.log(req.body);
 
     if (
@@ -13,7 +13,6 @@ const register = async (req, res) => {
       !cedula ||
       !tel ||
       !email ||
-      !username ||
       !password
     ) {
       return res
@@ -37,7 +36,6 @@ const register = async (req, res) => {
       cedula,
       tel,
       email,
-      username,
       password: hashedPassword,
     });
 
