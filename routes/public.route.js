@@ -3,7 +3,7 @@ import path from 'path';
 
 const router = Router();
 
-const __dirname = import.meta.dirname;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicPath = path.join(__dirname, '../public');
 
 router.get('/login', (req, res) => {
