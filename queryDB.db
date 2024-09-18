@@ -1,0 +1,28 @@
+CREATE TABLE suites (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    capacity INT NOT NULL
+);
+select * from suites
+
+ALTER TABLE suites ADD COLUMN price DECIMAL(10, 2) NOT NULL;
+
+CREATE TABLE reservations (
+    id SERIAL PRIMARY KEY,
+    id_suite INT NOT NULL,
+	id_user INT NOT NULL,
+    date DATE NOT NULL,
+    
+    FOREIGN KEY (id_suite) REFERENCES suites(id),
+	FOREIGN KEY (id_user) REFERENCES users(id)
+);
+
+CREATE TABLE suite_availability (
+    id_suite INT NOT NULL,
+    date DATE NOT NULL,
+    available_suites INT NOT NULL,
+    PRIMARY KEY (id_suite, date),
+    FOREIGN KEY (id_suite) REFERENCES suites(id)
+);
+
+select * from suite_availability

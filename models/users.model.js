@@ -33,7 +33,31 @@ const findOneByEmail = async (email) => {
   return rows[0];
 }
 
+const getIdByEmail = async (email) => {
+  const query = {
+    text: `
+    SELECT id FROM users
+    WHERE email = $1;`,
+    values: [email],
+  };
+
+  const { rows } = await db.query(query);
+  return rows[0];
+}
+
+const getAllUsers = async () => {
+  const query = {
+    text: `
+    SELECT * FROM users;`,
+  };
+
+  const { rows} = await db.query(query);
+  return rows;
+}
+
 export const UserModel = {
   create,
-  findOneByEmail
+  findOneByEmail,
+  getIdByEmail,
+  getAllUsers,
 };
