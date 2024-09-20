@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+</head>
+<body>
+    <h1>REGISTER</h1>
+
+    <form id="registerForm" style="display: grid; gap: 10px;">
+        <input type="text" placeholder="name" name="name" id="name">
+        <input type="text" placeholder="lastname" name="lastname" id="lastname">
+        <input type="text" placeholder="cedula" name="cedula" id="cedula">
+        <input type="text" placeholder="tel" name="tel" id="tel">
+        <input type="text" placeholder="email" name="email" id="email">
+        <input type="text" placeholder="password" name="password" id="password">
+        <button type="submit">REGISTRARSE</button>
+        <a href="/">VOLVER A HOME</a>
+    </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+        const registerForm = document.getElementById('registerForm');
+
+        registerForm.addEventListener("submit", async()=>{
+            event.preventDefault();
+
+            const formData = new FormData(registerForm);
+
+            try{
+                const {data} = await axios.post('/api/register', {
+                    name: formData.get('name'),
+                    lastname: formData.get('lastname'),
+                    cedula: formData.get('cedula'),
+                    tel: formData.get('tel'),
+                    email: formData.get('email'),
+                    password: formData.get('password')
+                });
+                console.log(data)
+                localStorage.setItem('token', data.token);
+                window.location.href = '/login';
+            }catch(error){
+                console.error(error);
+            }
+        })
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Suite</title>
+</head>
+<body>
+    <form id="createSuiteForm">
+        <input type="text" placeholder="Name" name="name" id="name" required>
+        <input type="number" placeholder="Price" name="price" id="price" required>
+        <input type="number" placeholder="Capacity" name="capacity" id="capacity" required>
+        <input type="number" placeholder="Count" name="count" id="count" required>
+        <input type="text" placeholder="Description" name="description" id="description">
+        <input type="text" placeholder="Image Gallery (comma separated URLs)" name="image_gallery" id="image_gallery">
+        <button type="submit">Create Suite</button>
+    </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        document.getElementById('createSuiteForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            const imageGallery = formData.get('image_gallery').split(',').map(url => url.trim());
+
+            const suiteData = {
+                name: formData.get('name'),
+                price: parseFloat(formData.get('price')),
+                capacity: parseInt(formData.get('capacity')),
+                count: parseInt(formData.get('count')),
+                description: formData.get('description'),
+                image_gallery: imageGallery
+            };
+
+            try {
+                const { data } = await axios.post('/api/createSuite', suiteData, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                console.log(data);
+                alert('Suite created successfully!');
+            } catch (error) {
+                console.error(error);
+                alert('Failed to create suite.');
+            }
+        });
+    </script>
+</body>
+</html>

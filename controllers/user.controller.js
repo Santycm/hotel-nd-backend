@@ -40,9 +40,17 @@ const register = async (req, res) => {
       password: hashedPassword,
     });
 
-    const token = jwt.sign({ email: newUser.email }, process.env.JWT_SECRET, {
+    if (!newUser) {
+      return res
+        .status(400)
+        .json({ ok: false, message: "Failed to create user" });
+    }
+
+    const token = jwt.sign({ email: email }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
+
+    
 
     return res.status(201).json({ ok: true, token: token });
   } catch (err) {
@@ -143,6 +151,19 @@ const profile = async (req, res) => {
   }
 };
 
+//Dev TEST
+const getSuites = async (req, res) => {
+  try {
+    const suites = await SuiteModel.getAllSuites();
+    return res.status(200).json({ ok: true, suites: suites });
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(500)
+      .json({ ok: false, message: "Internal server error" });
+  }
+}
+
 const getAllUsers = async (req, res) => {
   try {
     const users = await UserModel.getAllUsers();
@@ -184,5 +205,6 @@ export const UserController = {
   profile,
   createReservation,
   getAllUsers,
-  createSuite
+  createSuite,
+  getSuites,
 };

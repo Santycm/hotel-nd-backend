@@ -4,13 +4,17 @@ import { verifyToken } from '../middlewares/jwt.middleware.js';
 
 const router = Router();
 
+//Method post
 router.post('/register', UserController.register);
-router.get('/users', UserController.getAllUsers);
 router.post('/login', UserController.login);
-router.get('/profile', verifyToken, UserController.profile);
+
+//Method get
+router.get("/suites", UserController.getSuites);
+router.get("/profile", verifyToken, UserController.profile);
+router.get("/users", UserController.getAllUsers);
 
 //Dev TEST
+
 router.post('/createReservation', UserController.createReservation);
-router.post('/createSuite', UserController.createSuite);
 
 export default router;

@@ -13,7 +13,9 @@ CREATE TABLE suites (
 	name VARCHAR(255) NOT NULL,
 	price DECIMAL(10,2)NOT NULL,
 	capacity INT NOT NULL,
-	count INT NOT  NULL
+	count INT NOT  NULL,
+    description TEXT,
+    image_gallery JSONB
 );
 
 CREATE TABLE suite_date(
