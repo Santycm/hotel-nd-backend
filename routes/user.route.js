@@ -8,8 +8,9 @@ router.post('/register', UserController.register);
 router.get('/users', UserController.getAllUsers);
 router.post('/login', UserController.login);
 router.get('/profile', verifyToken, UserController.profile);
+
+//Dev TEST
 router.post('/createReservation', UserController.createReservation);
 router.post('/createSuite', UserController.createSuite);
-router.post('/createSuiteAvailability', UserController.createSuiteAvailability);
 
 export default router;

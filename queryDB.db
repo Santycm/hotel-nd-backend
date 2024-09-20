@@ -1,28 +1,96 @@
-CREATE TABLE suites (
-    id SERIAL PRIMARY KEY,
+CREATE TABLE users (
+    id_user SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    capacity INT NOT NULL
+    lastname VARCHAR(255) NOT NULL,
+    cedula VARCHAR(20) NOT NULL UNIQUE,
+    tel VARCHAR(20),
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL
 );
+
+CREATE TABLE suites (
+	id_suite SERIAL PRIMARY KEY,
+	name VARCHAR(255) NOT NULL,
+	price DECIMAL(10,2)NOT NULL,
+	capacity INT NOT NULL,
+	count INT NOT  NULL
+);
+
+CREATE TABLE suite_date(
+	id_suite INT NOT NULL,
+	date_reservation DATE NOT NULL,
+	available_suites INT NOT NULL,
+	PRIMARY KEY (id_suite, date_reservation),
+	FOREIGN KEY (id_suite) REFERENCES suites(id_suite)
+);
+
+CREATE TABLE reservations(
+	id_reservation SERIAL PRIMARY KEY,
+	id_suite INT NOT NULL, 
+	id_user INT NOT NULL,
+	date_reservation DATE NOT NULL,
+
+	FOREIGN KEY (id_suite) REFERENCES suites(id_suite),
+	FOREIGN KEY (id_user) REFERENCES users(id_user)
+);
+
+INSERT INTO users (name, lastname, cedula, tel, email, password)
+VALUES ('John', 'Doe', '1234567890', '555-1234', 'john.doe@example.com', '12345');
+
+select * from users
+
+insert into suites(name, price, capacity, count)
+VALUES('Suite Deluxe', 150.00, 5, 10)
+
 select * from suites
 
-ALTER TABLE suites ADD COLUMN price DECIMAL(10, 2) NOT NULL;
-
-CREATE TABLE reservations (
-    id SERIAL PRIMARY KEY,
-    id_suite INT NOT NULL,
-	id_user INT NOT NULL,
-    date DATE NOT NULL,
+CREATE OR REPLACE FUNCTION verifyAvailable(p_date_reservation DATE)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    availables INT;
+BEGIN
+    SELECT available_suites INTO availables
+    FROM suite_date
+    WHERE suite_date.date_reservation = p_date_reservation;
     
-    FOREIGN KEY (id_suite) REFERENCES suites(id),
-	FOREIGN KEY (id_user) REFERENCES users(id)
-);
+    IF availables > 0 OR availables IS NULL THEN
+        RETURN TRUE;
+    ELSE
+        RETURN FALSE;
+    END IF;
+END;
+$$;
+	
+CREATE OR REPLACE PROCEDURE sp_reservate(p_id_suite INT, p_id_user INT, p_date_reservation DATE)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    available INT;
+BEGIN
+    IF verifyAvailable(p_date_reservation) THEN
+        INSERT INTO reservations(id_suite, id_user, date_reservation)
+        VALUES(p_id_suite, p_id_user, p_date_reservation);
+    ELSE
+        RAISE NOTICE 'NO AVAILABLE FOR %.', p_date_reservation;
+        RETURN;
+    END IF;
+    
+    IF EXISTS (SELECT 1 FROM suite_date WHERE suite_date.date_reservation = p_date_reservation) THEN
+        UPDATE suite_date
+        SET available_suites = available_suites - 1
+        WHERE suite_date.date_reservation = p_date_reservation;
+    ELSE
+        SELECT count INTO available FROM suites WHERE id_suite = p_id_suite;    
+        INSERT INTO suite_date(id_suite, date_reservation, available_suites)
+        VALUES(p_id_suite, p_date_reservation, available-1);
+    END IF;
+END;
+$$;
 
-CREATE TABLE suite_availability (
-    id_suite INT NOT NULL,
-    date DATE NOT NULL,
-    available_suites INT NOT NULL,
-    PRIMARY KEY (id_suite, date),
-    FOREIGN KEY (id_suite) REFERENCES suites(id)
-);
+CALL sp_reservate(1,1,'2024-1-20')
 
-select * from suite_availability
+select * from reservations;
+select * from suite_date
+select * from suites

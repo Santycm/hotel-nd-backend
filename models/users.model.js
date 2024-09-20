@@ -36,7 +36,7 @@ const findOneByEmail = async (email) => {
 const getIdByEmail = async (email) => {
   const query = {
     text: `
-    SELECT id FROM users
+    SELECT id_user FROM users
     WHERE email = $1;`,
     values: [email],
   };
@@ -51,7 +51,7 @@ const getAllUsers = async () => {
     SELECT * FROM users;`,
   };
 
-  const { rows} = await db.query(query);
+  const { rows } = await db.query(query);
   return rows;
 }
 
