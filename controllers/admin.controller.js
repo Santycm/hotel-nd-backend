@@ -1,46 +1,71 @@
+import multer from "multer";
+import { v2 as cloudinary } from "cloudinary";
 import { SuiteModel } from "../models/suites.model.js";
+import fetch from "node-fetch"; // Asegúrate de tener node-fetch instalado
+import FormData from "form-data"; // Importa FormData
+
+const cloudinaryUrl = "https://api.cloudinary.com/v1_1/dctc1rhlx/image/upload";
+const cloudinaryPreset = "Purple";
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 const createSuite = async (req, res) => {
   try {
-    const { name, price, capacity, count, description, image_gallery } =
-      req.body;
+    const { name, price, capacity, count, description } = req.body;
+    const files = req.files;
 
-    if (
-      !name ||
-      !price ||
-      !capacity ||
-      !count ||
-      !description ||
-      !image_gallery
-    ) {
-      return res
-        .status(400)
-        .json({ ok: false, message: "Missing required fields" });
+    console.log(files);
+    console.log(name);
+
+    if (!files || files.length === 0) {
+      return res.status(400).json({ ok: false, message: "No files uploaded" });
     }
 
-    // Verificar que image_gallery sea un array de URLs
-    if (
-      !Array.isArray(image_gallery) ||
-      !image_gallery.every((url) => typeof url === "string")
-    ) {
-      return res
-        .status(400)
-        .json({ ok: false, message: "image_gallery must be an array of URLs" });
-    }
+    files.forEach((file) => {
+      console.log(`File: ${file.originalname}, Size: ${file.size}`);
+    });
 
-    // Convertir image_gallery a una cadena JSON
-    const imageGalleryJson = JSON.stringify(image_gallery);
+    const imageUrls = await Promise.all(
+      files.map(async (file) => {
+        if (!file || !file.buffer) {
+          throw new Error("File or file buffer is undefined");
+        }
 
-    const suite = await SuiteModel.create({
+        const formData = new FormData();
+        formData.append("file", file.buffer, {
+          filename: file.originalname,
+          contentType: file.mimetype,
+        });
+        formData.append("upload_preset", cloudinaryPreset);
+        formData.append("folder", "HOTELND");
+
+        const response = await fetch(cloudinaryUrl, {
+          method: "POST",
+          body: formData,
+          headers: formData.getHeaders(), // Asegúrate de incluir los encabezados correctos
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to upload image: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data.secure_url;
+      })
+    );
+
+    console.log(imageUrls);
+
+    /*const suite = await SuiteModel.create({
       name,
       price,
       capacity,
       count,
       description,
-      image_gallery: imageGalleryJson,
     });
 
-    return res.status(201).json({ ok: true, message: suite });
+    return res.status(201).json({ ok: true, message: suite });*/
   } catch (err) {
     console.log(err);
     return res
@@ -50,5 +75,5 @@ const createSuite = async (req, res) => {
 };
 
 export const AdminController = {
-    createSuite,
-}
+  createSuite,
+};
