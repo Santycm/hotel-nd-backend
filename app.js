@@ -8,7 +8,7 @@ import adminRouter from "./routes/admin.route.js";
 const app = express();
 
 const corsOptions = {
-  origin: "https://naturaldreams.netlify.app",
+  origin: ["https://naturaldreams.netlify.app", "http://localhost:5173"],
   optionsSuccessStatus: 200,
 };
 
