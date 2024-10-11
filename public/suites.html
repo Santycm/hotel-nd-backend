@@ -29,6 +29,7 @@
                         <p>${suite.price}</p>
                         <p>${suite.capacity}</p>
                         <p>Description: ${suite.description}</p>
+                        <a href="/reservation?ID=${suite.id_suite}">Reserve</a>
                          <div>
                             ${suite.image_gallery.map(url => `<img src="${url}" alt="Suite Image" style="width:100px;height:auto;">`).join('')}
                         </div>

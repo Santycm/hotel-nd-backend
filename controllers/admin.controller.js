@@ -15,9 +15,6 @@ const createSuite = async (req, res) => {
     const { name, price, capacity, count, description } = req.body;
     const files = req.files;
 
-    console.log(files);
-    console.log(name);
-
     if (!files || files.length === 0) {
       return res.status(400).json({ ok: false, message: "No files uploaded" });
     }
@@ -43,7 +40,7 @@ const createSuite = async (req, res) => {
         const response = await fetch(cloudinaryUrl, {
           method: "POST",
           body: formData,
-          headers: formData.getHeaders(), // Asegúrate de incluir los encabezados correctos
+          headers: formData.getHeaders(),
         });
 
         if (!response.ok) {
@@ -55,17 +52,16 @@ const createSuite = async (req, res) => {
       })
     );
 
-    console.log(imageUrls);
-
-    /*const suite = await SuiteModel.create({
+    const suite = await SuiteModel.create({
       name,
       price,
       capacity,
       count,
       description,
+      image_gallery: imageUrls,
     });
 
-    return res.status(201).json({ ok: true, message: suite });*/
+    return res.status(201).json({ ok: true, message: suite });
   } catch (err) {
     console.log(err);
     return res

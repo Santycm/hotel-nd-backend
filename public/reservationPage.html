@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <form>
+        <input type="text">
+    </form>
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        
+        const getSuiteInfo = async () => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const suiteID = urlParams.get('ID');
+                console.log(suiteID);
+
+                try {
+                    const response = await axios.post('/api/suiteInfo', {
+                        id_suite: suiteID
+                    }, {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    console.log(response.data);
+                    // Aquí puedes manejar la respuesta, por ejemplo, renderizar la información en la página
+                } catch (error) {
+                    console.error('Error fetching suite details:', error);
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', getSuiteInfo);
+        
+    </script>
+</body>
+</html>

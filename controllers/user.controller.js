@@ -61,6 +61,33 @@ const register = async (req, res) => {
   }
 };
 
+const getSuiteInfo = async (req, res) => {
+  try{
+    const {id_suite} = req.body;
+    console.log(id_suite);
+    
+    if(!id_suite){
+      return res
+        .status(400)
+        .json({ ok: false, message: "Missing required fields" });
+    }
+
+    const suite = await SuiteModel.getSuiteById(id_suite);
+    if(!suite){
+      return res
+        .status(400)
+        .json({ ok: false, message: "Suite not found" });
+    }
+
+    return res.status(200).json({ ok: true, message: suite });
+  }catch(err){
+    console.log(err);
+    return res
+      .status(500)
+      .json({ ok: false, message: "Internal server error" });
+  }
+}
+
 const createReservation = async (req, res) => {
   try{
     const {user_email, suite_name, date } = req.body;
@@ -151,7 +178,6 @@ const profile = async (req, res) => {
   }
 };
 
-//Dev TEST
 const getSuites = async (req, res) => {
   try {
     const suites = await SuiteModel.getAllSuites();
@@ -176,35 +202,12 @@ const getAllUsers = async (req, res) => {
   }
 }
 
-const createSuite = async (req, res) => {
-  try {
-    const { name, price, capacity, count } = req.body;
-
-    if (!name || !price || !capacity || !count) {
-      return res
-        .status(400)
-        .json({ ok: false, message: "Missing required fields" });
-    }
-
-    const suite = await SuiteModel.create({ name, price, capacity, count });
-
-    return res.status(201).json({ ok: true, message: suite });
-  } catch (err) {
-    console.log(err);
-    return res
-      .status(500)
-      .json({ ok: false, message: "Internal server error" });
-  }
-}
-
-
-
 export const UserController = {
   register,
   login,
   profile,
   createReservation,
   getAllUsers,
-  createSuite,
   getSuites,
+  getSuiteInfo,
 };

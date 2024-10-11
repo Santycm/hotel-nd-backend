@@ -12,6 +12,7 @@ router.post('/login', UserController.login);
 router.get("/suites", UserController.getSuites);
 router.get("/profile", verifyToken, UserController.profile);
 router.get("/users", UserController.getAllUsers);
+router.post("/suiteInfo", UserController.getSuiteInfo);
 
 //Dev TEST
 
