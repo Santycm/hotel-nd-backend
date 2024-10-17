@@ -7,13 +7,15 @@ const router = Router();
 /* Method post */
 router.post('/register', UserController.register);
 router.post('/login', UserController.login);
-router.post("/createReservation", verifyToken, UserController.createReservation); //create reservation
-router.post("/verifyAvailable", UserController.verifyAvaliability); //verify available whuile loading the page
+router.post("/create-reservation", verifyToken, UserController.createReservation); //create reservation
+router.post("/delete-reservation", verifyToken, UserController.deleteReservation); //delete reservation
+router.post("/my-reservations", verifyToken, UserController.getReservationsByUser); //get reservations by user
+router.post("/verify-available", UserController.verifyAvaliability); //verify available whuile loading the page
 
 //Method get
 router.get("/suites", UserController.getSuites);
 router.get("/profile", verifyToken, UserController.profile);
 router.get("/users", UserController.getAllUsers);
-router.post("/suiteInfo", UserController.getSuiteInfo);
+router.post("/suite-info", UserController.getSuiteInfo);
 
 export default router;

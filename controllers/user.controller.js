@@ -4,6 +4,12 @@ import { ReservationModel } from "../models/reservation.model.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+/*
+ * Register a new user
+ * @param {name, lastname, cedula, tel, email, password} req.body
+ * @returns {token} res
+ *
+ */
 const register = async (req, res) => {
   try {
     const { name, lastname, cedula, tel, email, password } = req.body;
@@ -52,6 +58,11 @@ const register = async (req, res) => {
   }
 };
 
+/*
+ * Get suite information
+ * @param {id_suite} req.body
+ * @returns {suite} res
+ */
 const getSuiteInfo = async (req, res) => {
   try {
     const { id_suite } = req.body;
@@ -76,6 +87,11 @@ const getSuiteInfo = async (req, res) => {
   }
 };
 
+/**
+ * Verify the availability of a suite for the next 12 months
+ * @param {id_suite} req.body
+ * @returns {datesUnavailable} res
+ */
 const verifyAvaliability = async (req, res) => {
   try {
     const { id_suite } = req.body;
@@ -114,6 +130,11 @@ const verifyAvaliability = async (req, res) => {
   }
 };
 
+/**
+ * Create a reservation
+ * @param {user_email, id_suite, date} req.body
+ * @returns {reservation} res
+ */
 const createReservation = async (req, res) => {
   try {
     const { user_email, id_suite, date } = req.body;
@@ -144,6 +165,57 @@ const createReservation = async (req, res) => {
     }
 
     return res.status(201).json({ ok: true, message: reservation });
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(500)
+      .json({ ok: false, message: "Internal server error" });
+  }
+};
+
+/*
+ * Get all reservations by user
+ * @param {user_email} req.body
+ * @returns {reservations} res
+ */
+const getReservationsByUser = async (req, res) => {
+  try {
+    const { user_email } = req.body;
+
+    if (!user_email) {
+      return res
+        .status(400)
+        .json({ ok: false, message: "Missing required fields" });
+    }
+
+    const { id_user } = await UserModel.getIdByEmail(user_email);
+
+    const reservations = await ReservationModel.getReservationsByUser(id_user);
+
+    return res.status(200).json({ ok: true, message: reservations });
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(500)
+      .json({ ok: false, message: "Internal server error" });
+  }
+};
+
+const deleteReservation = async (req, res) => {
+  try {
+    const { id_reservation } = req.body;
+
+    if (!id_reservation) {
+      return res
+        .status(400)
+        .json({ ok: false, message: "Missing required fields" });
+    }
+
+    const reservation = await ReservationModel.deleteReservation(
+      id_reservation
+    );
+
+    return res.status(200).json({ ok: true, message: reservation });
   } catch (err) {
     console.log(err);
     return res
@@ -235,4 +307,6 @@ export const UserController = {
   getSuites,
   getSuiteInfo,
   verifyAvaliability,
+  getReservationsByUser,
+  deleteReservation,
 };

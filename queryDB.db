@@ -92,6 +92,36 @@ BEGIN
 END;
 $$;
 
+CREATE OR REPLACE PROCEDURE sp_deleteReservation(id_res INT)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+	date_res DATE;
+	p_id_suite INT;
+	available INT;
+	count_suite INT;
+BEGIN
+	SELECT date_reservation, id_suite into date_res, p_id_suite
+	FROM reservations
+	WHERE id_reservation = id_res;
+	
+    DELETE FROM reservations WHERE id_reservation = id_res;
+	SELECT count INTO count_suite FROM suites WHERE id_suite = p_id_suite;
+	SELECT available_suites INTO available FROM suite_date WHERE date_reservation = date_res;
+	
+	IF EXISTS (SELECT 1 FROM suite_date WHERE suite_date.date_reservation = date_res AND suite_date.id_suite = p_id_suite) THEN
+	 	IF (count_suite = available+1) THEN
+		 DELETE FROM suite_date WHERE id_suite = p_id_suite;
+		ELSE
+			UPDATE suite_date
+    		SET available_suites = available_suites + 1
+    		WHERE suite_date.date_reservation = date_res AND suite_date.id_suite = p_id_suite;  
+		END IF;
+    END IF;
+		
+END;
+$$;
+
 CALL sp_reservate(1,1,'2024-1-20')
 
 select * from reservations;

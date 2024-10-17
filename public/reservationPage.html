@@ -28,7 +28,7 @@
             console.log(suiteID);
 
             try {
-                const response = await axios.post('/api/suiteInfo', {
+                const response = await axios.post('/api/suite-info', {
                     id_suite: suiteID
                 }, {
                     headers: {
@@ -48,7 +48,7 @@
             console.log(suiteID);
 
             try {
-                const response = await axios.post('/api/verifyAvailable', {
+                const response = await axios.post('/api/verify-available', {
                     id_suite: suiteID
                 }, {
                     headers: {
@@ -67,8 +67,8 @@
         const getUserEmailFromToken = () => {
             const token = localStorage.getItem('token'); // Asumiendo que el token está almacenado bajo la clave 'token'
             if (!token) {
-                console.error('No token found in localStorage');
-                return null;
+                alert('No hay un token almacenado, por favor inicia sesión');
+                window.location.href = '/login';
             }
 
             try {
@@ -91,7 +91,7 @@
             console.log(suiteID);
 
             try {
-                const response = await axios.post('/api/createReservation', {
+                const response = await axios.post('/api/create-reservation', {
                     id_suite: suiteID,
                     user_email: userEmail,
                     date: document.getElementById('datePicker').value
