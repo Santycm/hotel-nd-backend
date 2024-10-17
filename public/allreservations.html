@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <main>
+        <table id="reservations">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Fecha</th>
+                    <th>Email</th>
+                    <th>Cedula</th>
+                    <th>Nombre</th>
+                    <th>Apellidos</th>
+                    <th>Suite</th>
+                    <th>Precio</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        let reservations = [];
+        const getAllReservations = async () => {
+            try {
+
+                const response = await axios.get('/api/getAllReservations');
+                reservations = response.data.message;
+
+            } catch (error) {
+                console.error('Error fetching all reservations:', error);
+            }
+        }
+
+        const setReservationsOnTable = () => {
+            const reservationsTable = document.getElementById('reservations');
+
+            const reservationsBody = reservationsTable.querySelector('tbody');
+            reservationsBody.innerHTML = '';
+            reservations.forEach(reservation => {
+                const row = document.createElement('tr');
+
+                const idCell = document.createElement('td');
+                idCell.innerText = reservation.id_reservation;
+                row.appendChild(idCell);
+
+                const dateCell = document.createElement('td');
+                dateCell.innerText = new Date(reservation.date_reservation).toLocaleDateString();
+                row.appendChild(dateCell);
+
+                const emailCell = document.createElement('td');
+                emailCell.innerText = reservation.email;
+                row.appendChild(emailCell);
+
+                const cedulaCell = document.createElement('td');
+                cedulaCell.innerText = reservation.cedula;
+                row.appendChild(cedulaCell);
+
+                const nameCell = document.createElement('td');
+                nameCell.innerText = reservation.us_name;
+                row.appendChild(nameCell);
+
+                const lastnameCell = document.createElement('td');
+                lastnameCell.innerText = reservation.lastname;
+                row.appendChild(lastnameCell);
+
+                const suiteCell = document.createElement('td');
+                suiteCell.innerText = reservation.name;
+                row.appendChild(suiteCell);
+
+                const priceCell = document.createElement('td');
+                priceCell.innerText = reservation.price;
+                row.appendChild(priceCell);
+
+                const actionsCell = document.createElement('td');
+                const cancelButton = document.createElement('button');
+                cancelButton.innerText = 'Cancelar';
+                
+                cancelButton.addEventListener('click', async () => {
+                    try {
+                        const response = await axios.post('/api/admin_delete-reservation', {
+                            id_reservation: reservation.id_reservation
+                        });
+                        console.log(response.data);
+                        window.location.reload();
+                    } catch (error) {
+                        console.error('Error cancelling reservation:', error);
+                    }
+                });
+                actionsCell.appendChild(cancelButton);
+                row.appendChild(actionsCell);
+                reservationsBody.appendChild(row);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", async() => {
+            await getAllReservations();
+            console.log(reservations);
+            setReservationsOnTable();
+        })
+    </script>
+</body>
+
+</html>

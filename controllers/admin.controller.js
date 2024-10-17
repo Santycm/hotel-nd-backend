@@ -1,5 +1,6 @@
 import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
+import { ReservationModel } from "../models/reservation.model.js";
 import { SuiteModel } from "../models/suites.model.js";
 import fetch from "node-fetch"; // Asegúrate de tener node-fetch instalado
 import FormData from "form-data"; // Importa FormData
@@ -70,6 +71,20 @@ const createSuite = async (req, res) => {
   }
 };
 
+const getAllReservations = async (req, res) => {
+
+  try {
+    const reservations = await ReservationModel.getAllReservations();
+    return res.status(200).json({ ok: true, message: reservations });
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(500)
+      .json({ ok: false, message: "Internal server error" });
+  }
+}
+
 export const AdminController = {
   createSuite,
+  getAllReservations
 };

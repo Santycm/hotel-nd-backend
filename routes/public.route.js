@@ -39,5 +39,9 @@ router.get("/reservation", (req, res) => {
   res.sendFile(publicPath + '/reservationPage.html');
 });
 
+router.get("/all-reservations", (req, res) => {
+  res.sendFile(publicPath + "/allreservations.html");
+});
+
 
 export default router;

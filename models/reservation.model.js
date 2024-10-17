@@ -18,7 +18,10 @@ const create = async ({ id_suite, id_user, date }) => {
 const getAllReservations = async () => {
   const query = {
     text: `
-        SELECT * FROM reservations inner join suites on reservation.id_suite = suites.id_suite inner join users on reservations.id_user = users.id_user;`,
+      select res.id_reservation, res.date_reservation, us.email, us.cedula, us.name as us_name, us.lastname, su.name, su.price
+      from reservations res join suites su
+      on res.id_suite = su.id_suite join users us 
+      on us.id_user = res.id_user`,
   };
 
   const { rows } = await db.query(query);
