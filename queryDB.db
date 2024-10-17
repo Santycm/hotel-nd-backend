@@ -15,7 +15,7 @@ CREATE TABLE suites (
 	capacity INT NOT NULL,
 	count INT NOT  NULL,
     description TEXT,
-    image_gallery JSONB
+    image_gallery TEXT[]
 );
 
 CREATE TABLE suite_date(
@@ -46,7 +46,7 @@ VALUES('Suite Deluxe', 150.00, 5, 10)
 
 select * from suites
 
-CREATE OR REPLACE FUNCTION verifyAvailable(p_date_reservation DATE)
+CREATE OR REPLACE FUNCTION verifyAvailable(p_date_reservation DATE, p_id_suite INT)
 RETURNS BOOLEAN
 LANGUAGE plpgsql
 AS $$
@@ -55,7 +55,7 @@ DECLARE
 BEGIN
     SELECT available_suites INTO availables
     FROM suite_date
-    WHERE suite_date.date_reservation = p_date_reservation;
+    WHERE suite_date.date_reservation = p_date_reservation AND suite_date.id_suite = p_id_suite;
     
     IF availables > 0 OR availables IS NULL THEN
         RETURN TRUE;
@@ -64,6 +64,7 @@ BEGIN
     END IF;
 END;
 $$;
+
 	
 CREATE OR REPLACE PROCEDURE sp_reservate(p_id_suite INT, p_id_user INT, p_date_reservation DATE)
 LANGUAGE plpgsql
@@ -79,10 +80,10 @@ BEGIN
         RETURN;
     END IF;
     
-    IF EXISTS (SELECT 1 FROM suite_date WHERE suite_date.date_reservation = p_date_reservation) THEN
+    IF EXISTS (SELECT 1 FROM suite_date WHERE suite_date.date_reservation = p_date_reservation AND suite_date.id_suite = p_id_suite) THEN
         UPDATE suite_date
         SET available_suites = available_suites - 1
-        WHERE suite_date.date_reservation = p_date_reservation;
+        WHERE suite_date.date_reservation = p_date_reservation AND suite_date.id_suite = p_id_suite;
     ELSE
         SELECT count INTO available FROM suites WHERE id_suite = p_id_suite;    
         INSERT INTO suite_date(id_suite, date_reservation, available_suites)

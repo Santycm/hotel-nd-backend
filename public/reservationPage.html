@@ -1,41 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
+
 <body>
 
     <form>
-        <input type="text">
+        <label for="">Seleccione fecha (Solo 1 año posterior a la fecha actual)</label>
+        <input type="date" id="datePicker">
+        <button type="submit">Reservar</button>
     </form>
-    
+
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-        
-        const getSuiteInfo = async () => {
-                const urlParams = new URLSearchParams(window.location.search);
-                const suiteID = urlParams.get('ID');
-                console.log(suiteID);
 
-                try {
-                    const response = await axios.post('/api/suiteInfo', {
-                        id_suite: suiteID
-                    }, {
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                    console.log(response.data);
-                    // Aquí puedes manejar la respuesta, por ejemplo, renderizar la información en la página
-                } catch (error) {
-                    console.error('Error fetching suite details:', error);
-                }
+        let disabledDates = [];
+        const getSuiteInfo = async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const suiteID = urlParams.get('ID');
+            console.log(suiteID);
+
+            try {
+                const response = await axios.post('/api/suiteInfo', {
+                    id_suite: suiteID
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                console.log(response.data);
+                // Aquí puedes manejar la respuesta, por ejemplo, renderizar la información en la página
+            } catch (error) {
+                console.error('Error fetching suite details:', error);
+            }
+        }
+
+        const checkAvailability = async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const suiteID = urlParams.get('ID');
+            console.log(suiteID);
+
+            try {
+                const response = await axios.post('/api/verifyAvailable', {
+                    id_suite: suiteID
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                console.log(response.data);
+                
+                disabledDates = response.data.message;
+                // Aquí puedes manejar la respuesta, por ejemplo, renderizar la información en la página
+            } catch (error) {
+                console.error('Error fetching suite details:', error);
+            }
+        }
+
+        const getUserEmailFromToken = () => {
+            const token = localStorage.getItem('token'); // Asumiendo que el token está almacenado bajo la clave 'token'
+            if (!token) {
+                console.error('No token found in localStorage');
+                return null;
             }
 
-            document.addEventListener('DOMContentLoaded', getSuiteInfo);
-        
+            try {
+                const decodedToken = jwt_decode(token);
+                return decodedToken.email; // Asumiendo que el email está en el payload del token
+            } catch (error) {
+                console.error('Error decoding token:', error);
+                return null;
+            }
+        }
+
+        const reserveSuite = async () => {
+            const userEmail = getUserEmailFromToken();
+            if (userEmail) {
+                console.log('User email:', userEmail);
+                // Puedes usar userEmail aquí según sea necesario
+            }
+            const urlParams = new URLSearchParams(window.location.search);
+            const suiteID = urlParams.get('ID');
+            console.log(suiteID);
+
+            try {
+                const response = await axios.post('/api/createReservation', {
+                    id_suite: suiteID,
+                    user_email: userEmail,
+                    date: document.getElementById('datePicker').value
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                console.log(response.data);
+                if(response.data.ok){
+                    alert('Reservación exitosa');
+                }else{
+                    alert('Error al reservar');
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async() => {
+            await getSuiteInfo();
+            await checkAvailability();
+
+           flatpickr("#datePicker", {
+                disable: disabledDates.map(date => flatpickr.parseDate(date, "Y-m-d")),
+                dateFormat: "Y-m-d"
+            });
+
+            document.querySelector('form').addEventListener('submit', async(event) => {
+                event.preventDefault();
+                await reserveSuite();
+            });
+        });
+
     </script>
 </body>
+
 </html>
